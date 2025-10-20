@@ -1,9 +1,9 @@
 # M1C0001
 Pybit - microbit car
 
-Pybit uses makecode programming.
+Pybit is programmed using makecode and Python editor.
 
-[MakeCode](https://www.microbit.org/).
+[programming](https://www.microbit.org/code/).
 
 ## Download
 
