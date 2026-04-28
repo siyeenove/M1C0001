@@ -1,15 +1,16 @@
 # Imports go at the top
 from microbit import *
+import radio
 
-# Car I2C address
 i2cAddr = 0x2a
 
-# For wheel
+# For wheels
 leftwheel  = 0
 rightwheel = 1
 backward = 0
 forward  = 1
 i2cBuf = bytearray([0x00, 0x00])
+
 
 # Set the wheel speed function
 # wheel: 0 = left wheel, 1 = right wheel
@@ -21,15 +22,16 @@ def setWheelSpeed(wheel, direction, speed):
         speed = 100
     elif speed < 0:
         speed = 0
-    if wheel == leftwheel:          
+       
+    if wheel == leftwheel:
         i2cBuf[0] = 0x05  # left wheel register 
         if direction == forward:
             # speed value, 101 is the default required data.
-            i2cBuf[1] = speed + 101     
+            i2cBuf[1] = 101     
         elif direction == backward:
             i2cBuf[1] = speed
         i2c.write(i2cAddr, i2cBuf)
-
+       
     if wheel == rightwheel:         
         i2cBuf[0] = 0x06  # right wheel register
         if direction == forward:
@@ -38,16 +40,44 @@ def setWheelSpeed(wheel, direction, speed):
             # speed value, 101 is the default required data.
             i2cBuf[1] = speed + 101
         i2c.write(i2cAddr, i2cBuf)
+    
+# Display image
+display.show(Image.HAPPY)
+sleep(400)
+
+# Configure the radio
+radio.config(group=1)
+radio.on()
 
 # Code in a 'while True:' loop repeats forever
 while True:
-    if display.read_light_level() < 50:
-        # Turn left at place
-        setWheelSpeed(leftwheel, backward, 50)
-        setWheelSpeed(rightwheel, forward, 50)  
-    else:
-        # Forward
-        setWheelSpeed(leftwheel, forward, 70)
-        setWheelSpeed(rightwheel, forward, 70) 
+    xData = 0
+    yData = 0
+    
+    xy = ''
+    xyData = 0
+    message = radio.receive()
+    if message != None:
+        # Gets the first character of a string.
+        xy = message[0]  
+        # Gets the second to last character of a string.
+        xyData = message[1:]   
+        # Converts a string to a number.
+        xyData = int(xyData)   
+
+        if xy == 'x':
+            xData = xyData
+        if xy == 'y':
+            yData = xyData
+    
+    
+    if xData + yData >= 0:
+        setWheelSpeed(leftwheel, forward, xData + yData)
+    if xData + yData < 0:
+        setWheelSpeed(leftwheel, backward, abs(xData + yData))   
+    if yData - xData >= 0:
+        setWheelSpeed(rightwheel, forward, yData - xData)
+    if yData + xData < 0:
+        setWheelSpeed(rightwheel, backward, abs(yData - xData))    
      
 

@@ -62,8 +62,8 @@ while True:
         setWheelSpeed(rightwheel, backward, 60) 
     elif message == '3':
         # Forward
-        setWheelSpeed(leftwheel, forward, 100)
-        setWheelSpeed(rightwheel, forward, 100) 
+        setWheelSpeed(leftwheel, forward, 70)
+        setWheelSpeed(rightwheel, forward, 70) 
         sleep(200)
      
 
